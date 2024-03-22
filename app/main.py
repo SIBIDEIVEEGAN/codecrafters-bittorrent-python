@@ -18,12 +18,12 @@ def decode_bencode(bencoded_value):
                 len = int(len)
                 return rest[:len],rest[len:]   # add the next part of data
                 
-    if chr(bencoded_value[0]) == "i":
+    elif chr(bencoded_value[0]) == "i":
        
        end = bencoded_value.index(b"e")
        return int(bencoded_value[1:end]),bencoded_value[end+1:]
       
-    if chr(bencoded_value[0]) == "l":
+    elif chr(bencoded_value[0]) == "l":
         bencoded_value = bencoded_value[1:]
         rlist = []
         while not bencoded_value.startswith(b"e"): 
@@ -32,6 +32,16 @@ def decode_bencode(bencoded_value):
             
         return rlist,bencoded_value[1:]
                        # remove what we just added from data
+    elif chr(bencoded_value[0]) == "d":
+         
+         bencoded_value = bencoded_value[1:]
+         rlist = {}
+         while not bencoded_value.startswith(b"e"): 
+            itmk,bencoded_value=decode_bencode(bencoded_value) 
+            itmv,bencoded_value=decode_bencode(bencoded_value) 
+            rlist[itmk.decode()] = itmv
+            
+         return rlist,bencoded_value[1:]
        
     else:
         raise NotImplementedError("Only strings are supported at the moment")
